@@ -30,17 +30,21 @@ def update_aged_brie(item)
   item.restore!(item.sell_in.negative? ? 2 : 1)
 end
 
-def update_backstage_passes(item)
-  if item.sell_in <= 0
-    item.quality = 0
-  elsif (6..10).cover?(item.sell_in)
-    item.restore!(2)
-  elsif (0..5).cover?(item.sell_in)
-    item.restore!(3)
+def backstage_restore_amount(item)
+  if item.sell_in <= -1
+    -item.quality
+  elsif (5..9).cover?(item.sell_in)
+    2
+  elsif (0..4).cover?(item.sell_in)
+    3
   else
-    item.restore!
+    1
   end
+end
+
+def update_backstage_passes(item)
   item.age!
+  item.restore!(backstage_restore_amount(item))
 end
 
 def update_standard(item)
