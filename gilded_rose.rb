@@ -25,31 +25,27 @@ class ItemWrapper < SimpleDelegator
   end
 end
 
-def update_backstage_passes_impl(item)
-  if item.sell_in < 11
-    item.restore!
-  end
-  if item.sell_in < 6
-    item.restore!
-  end
-end
-
 def update_aged_brie(item)
-  item.restore!
   item.age!
-  item.restore! if item.sell_in < 0
+  item.restore!(item.sell_in.negative? ? 2 : 1)
 end
 
 def update_backstage_passes(item)
-  item.restore! { update_backstage_passes_impl(item) }
+  if item.sell_in <= 0
+    item.quality = 0
+  elsif (6..10).cover?(item.sell_in)
+    item.restore!(2)
+  elsif (0..5).cover?(item.sell_in)
+    item.restore!(3)
+  else
+    item.restore!
+  end
   item.age!
-  item.quality = 0 if item.sell_in < 0
 end
 
 def update_standard(item)
-  item.degrade!
   item.age!
-  item.degrade! if item.sell_in < 0
+  item.degrade!(item.sell_in.negative? ? 2 : 1)
 end
 
 def update_item(item)
@@ -61,12 +57,6 @@ def update_item(item)
   else
     update_standard(item)
   end
-end
-
-def update_standard(item)
-  item.degrade!
-  item.age!
-  item.degrade! if item.sell_in < 0
 end
 
 def update_quality(items)
