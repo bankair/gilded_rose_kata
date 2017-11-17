@@ -66,26 +66,9 @@ def update_item(item)
 end
 
 def update_standard(item)
-  if item.name == ItemWrapper::AGED_BRIE || item.name == ItemWrapper::BACKSTAGE_PASSES
-    update_aged_brie_or_backstage_passes(item)
-  else
-    item.degrade!
-  end
-
+  item.degrade!
   item.age!
-
-  if item.sell_in < 0
-
-    if item.name == ItemWrapper::AGED_BRIE
-      item.restore!
-    else
-      if item.name == ItemWrapper::BACKSTAGE_PASSES
-        item.quality = 0
-      else
-        item.degrade!
-      end
-    end
-  end
+  item.degrade! if item.sell_in < 0
 end
 
 def update_quality(items)
