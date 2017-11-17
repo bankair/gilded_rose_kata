@@ -46,6 +46,12 @@ def update_backstage_passes(item)
   item.quality = 0 if item.sell_in < 0
 end
 
+def update_standard(item)
+  item.degrade!
+  item.age!
+  item.degrade! if item.sell_in < 0
+end
+
 def update_item(item)
   case item.name
   when ItemWrapper::AGED_BRIE
