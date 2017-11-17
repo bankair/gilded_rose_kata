@@ -1,7 +1,7 @@
 class ItemWrapper < SimpleDelegator
-  def restore!
+  def restore!(v = 1)
     return if __getobj__.quality >= 50
-    __getobj__.quality += 1
+    __getobj__.quality += v
     yield if block_given?
   end
 
