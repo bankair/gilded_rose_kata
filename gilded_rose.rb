@@ -28,12 +28,12 @@ end
 def update_aged_brie_or_backstage_passes(item)
   item.restore! do
     if item.name == ItemWrapper::BACKSTAGE_PASSES
-      update_backstage_passes(item)
+      update_backstage_passes_impl(item)
     end
   end
 end
 
-def update_backstage_passes(item)
+def update_backstage_passes_impl(item)
   if item.sell_in < 11
     item.restore!
   end
@@ -48,10 +48,18 @@ def update_aged_brie(item)
   item.restore! if item.sell_in < 0
 end
 
+def update_backstage_passes(item)
+  update_aged_brie_or_backstage_passes(item)
+  item.age!
+  item.quality = 0 if item.sell_in < 0
+end
+
 def update_item(item)
   case item.name
   when ItemWrapper::AGED_BRIE
     update_aged_brie(item)
+  when ItemWrapper::BACKSTAGE_PASSES
+    update_backstage_passes(item)
   else
     update_standard(item)
   end
