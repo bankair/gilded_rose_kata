@@ -5,10 +5,10 @@ class ItemWrapper < SimpleDelegator
     yield if block_given?
   end
 
-  def degrade!
+  def degrade!(v = 1)
     return unless quality.positive?
     return if sulfuras?
-    __getobj__.quality -= 1
+    __getobj__.quality -= v
   end
 
   AGED_BRIE = 'Aged Brie'
