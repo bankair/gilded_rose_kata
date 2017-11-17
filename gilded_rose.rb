@@ -1,49 +1,72 @@
-def update_quality(items)
-  items.each do |item|
-    if item.name != 'Aged Brie' && item.name != 'Backstage passes to a TAFKAL80ETC concert'
-      if item.quality > 0
-        if item.name != 'Sulfuras, Hand of Ragnaros'
-          item.quality -= 1
-        end
-      end
-    else
-      if item.quality < 50
-        item.quality += 1
-        if item.name == 'Backstage passes to a TAFKAL80ETC concert'
-          if item.sell_in < 11
-            if item.quality < 50
-              item.quality += 1
-            end
-          end
-          if item.sell_in < 6
-            if item.quality < 50
-              item.quality += 1
-            end
-          end
-        end
-      end
-    end
-    if item.name != 'Sulfuras, Hand of Ragnaros'
-      item.sell_in -= 1
-    end
-    if item.sell_in < 0
-      if item.name != "Aged Brie"
-        if item.name != 'Backstage passes to a TAFKAL80ETC concert'
-          if item.quality > 0
-            if item.name != 'Sulfuras, Hand of Ragnaros'
-              item.quality -= 1
-            end
-          end
-        else
-          item.quality = item.quality - item.quality
-        end
-      else
-        if item.quality < 50
-          item.quality += 1
-        end
-      end
+class ItemWrapper < SimpleDelegator
+  def restore!
+    return if __getobj__.quality >= 50
+    __getobj__.quality += 1
+    yield if block_given?
+  end
+
+  def degrade!
+    return unless quality.positive?
+    return if sulfuras?
+    __getobj__.quality -= 1
+  end
+
+  AGED_BRIE = 'Aged Brie'
+  BACKSTAGE_PASSES = 'Backstage passes to a TAFKAL80ETC concert'
+  SULFURAS = 'Sulfuras, Hand of Ragnaros'
+
+  def age!
+    return if sulfuras?
+    __getobj__.sell_in -= 1
+  end
+
+  def sulfuras?
+    name == SULFURAS
+  end
+end
+
+def update_aged_brie_or_backstage_passes(item)
+  item.restore! do
+    if item.name == ItemWrapper::BACKSTAGE_PASSES
+      update_backstage_passes(item)
     end
   end
+end
+
+def update_backstage_passes(item)
+  if item.sell_in < 11
+    item.restore!
+  end
+  if item.sell_in < 6
+    item.restore!
+  end
+end
+
+def update_item(item)
+    if item.name == ItemWrapper::AGED_BRIE || item.name == ItemWrapper::BACKSTAGE_PASSES
+      update_aged_brie_or_backstage_passes(item)
+    else
+      item.degrade!
+    end
+
+    item.age!
+
+    if item.sell_in < 0
+
+      if item.name == ItemWrapper::AGED_BRIE
+        item.restore!
+      else
+        if item.name == ItemWrapper::BACKSTAGE_PASSES
+          item.quality = 0
+        else
+          item.degrade!
+        end
+      end
+    end
+end
+
+def update_quality(items)
+  items.each { |item| update_item(ItemWrapper.new(item)) }
 end
 
 # DO NOT CHANGE THINGS BELOW -----------------------------------------
