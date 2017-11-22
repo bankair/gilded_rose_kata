@@ -56,11 +56,22 @@ class BackStagePassesWrapper < ItemWrapper
   end
 end
 
+class ConjuredWrapper < ItemWrapper
+  def degradation_rate
+    -2
+  end
+
+  def self.match?(item)
+    item.name.start_with?('Conjured ')
+  end
+end
+
 module WrapperFactory
   WRAPPERS = [
     SulfurasWrapper,
     AgedBrieWrapper,
-    BackStagePassesWrapper
+    BackStagePassesWrapper,
+    ConjuredWrapper
   ].freeze
 
   def self.build(item)
