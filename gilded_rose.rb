@@ -32,7 +32,7 @@ class AgedBrieWrapper < ItemWrapper
   NAME = 'Aged Brie'
   def update!
     age!
-    offset_quality!(sell_in.negative? ? 2 : 1)
+    offset_quality!(-degradation_rate)
   end
 end
 
