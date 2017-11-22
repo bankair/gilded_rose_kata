@@ -9,9 +9,13 @@ class ItemWrapper < SimpleDelegator
     __getobj__.sell_in -= 1
   end
 
+  def degradation_rate
+    sell_in.negative? ? -2 : -1
+  end
+
   def update!
     age!
-    offset_quality!(sell_in.negative? ? -2 : -1)
+    offset_quality!(degradation_rate)
   end
 
   def self.match?(item)
